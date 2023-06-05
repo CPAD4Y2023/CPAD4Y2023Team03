@@ -2,7 +2,7 @@
 
 **Team Members:**
 
-Sujata Devi
-Rajdeep Biswas
-Naima Ismail
-Renu Rachel Johnson
+1. Sujata Devi
+2. Rajdeep Biswas
+3. Naima Ismail
+4. Renu Rachel Johnson
