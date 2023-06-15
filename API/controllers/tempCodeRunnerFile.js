@@ -1,0 +1,1 @@
+error: 'Registration failed'
