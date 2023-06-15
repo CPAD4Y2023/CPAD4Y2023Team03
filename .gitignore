@@ -1,0 +1,4 @@
+#config.js has sensitive data
+/API/config.js 
+/API/node_modules
+/.vscode
