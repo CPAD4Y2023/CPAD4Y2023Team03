@@ -1,31 +1,18 @@
+import 'package:crossplatform_app/screens/add_farm_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:crossplatform_app/screens/add_farm_landing_page.dart';
-import 'package:crossplatform_app/screens/signup_screen.dart';
-import 'package:crossplatform_app/screens/login.dart';
 import 'package:crossplatform_app/constants.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crossplatform_app/screens/signup_screen.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? token = prefs.getString('token');
-  runApp(
-    MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomePage(token: token),
-    ),
-  );
+class AddFarmLandingPage extends StatefulWidget {
+  final token;
+
+  const AddFarmLandingPage({@required this.token, Key? key}) : super(key: key);
+
+  @override
+  _AddFarmLandingPageState createState() => _AddFarmLandingPageState();
 }
 
-class HomePage extends StatelessWidget {
-  final String? token;
-
-  const HomePage({
-    required this.token,
-    Key? key,
-  }) : super(key: key);
-
+class _AddFarmLandingPageState extends State<AddFarmLandingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,49 +61,54 @@ class HomePage extends StatelessWidget {
                   MaterialButton(
                     minWidth: double.infinity,
                     height: 60,
+                    color: kPrimaryColor,
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginPage()),
-                      );
+                      if (widget.token != null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                AddFarmPage(token: widget.token),
+                          ),
+                        );
+                      } else {
+                        // Handle the case where the token is null
+                        // Display an error message or redirect to the login screen
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Error'),
+                            content:
+                                const Text('Token is null. Please log in.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SignupPage(),
+                                    ),
+                                  );
+                                },
+                                child: const Text('Login'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                     },
                     shape: RoundedRectangleBorder(
                       side: const BorderSide(color: Colors.black),
                       borderRadius: BorderRadius.circular(50),
                     ),
                     child: const Text(
-                      "Login",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  MaterialButton(
-                    minWidth: double.infinity,
-                    height: 60,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => SignupPage()),
-                      );
-                    },
-                    color: kPrimaryColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: const Text(
-                      "Sign up",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 18,
-                      ),
+                      "Add Farm",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
                     ),
                   ),
                 ],
-              ),
+              )
             ],
           ),
         ),

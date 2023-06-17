@@ -1,17 +1,22 @@
 const mongoose = require('mongoose');
 
 const farmSchema = new mongoose.Schema({
-  name: {
+  farmName: {
     type: String,
     required: true,
+    unique:true,
   },
-  landSize: {
+  farmSize: {
     type: Number,
     required: true,
   },
-  owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+  farmLocation:{
+    type: String,
+    required: true,
+  },
+  
+  farmerId: {
+    type: String,
     required: true,
   },
 });

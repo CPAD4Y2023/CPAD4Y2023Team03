@@ -1,11 +1,14 @@
 const express = require('express')
+const cors = require('cors');
 const mongoose = require('mongoose')
 const config = require('./config');
 const Product = require('./models/Vegetable')
 const app= express()
 
+app.use(cors()); // to resolve the cross domain/port api call issue
 //middleware for application to understand json
 app.use(express.json());
+
 
 
 const vegetablesRouter = require('./routes/Vegetable');

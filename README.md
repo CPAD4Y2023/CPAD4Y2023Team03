@@ -12,5 +12,5 @@ https://www.figma.com/proto/g0R4m4kxdtmDw2FjVAQzau/SwasthFarms-MockUp?type=desig
 
 
 **Team Members:**
-
 1. Sujata Devi (2020hs70011)
+

@@ -1,7 +1,63 @@
+import 'package:crossplatform_app/screens/signup_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crossplatform_app/screens/add_farm_landing_page.dart';
+import 'package:crossplatform_app/models/user_model.dart';
+import 'package:crossplatform_app/controllers/user_controller.dart';
 import 'package:crossplatform_app/constants.dart';
+import 'package:crossplatform_app/screens/login.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final UserController _userController = UserController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  bool _isNotValid = false;
+  late SharedPreferences prefs;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    initSharedPref();
+  }
+
+  void initSharedPref() async {
+    prefs = await SharedPreferences.getInstance();
+  }
+
+  String _loginStatus = '';
+
+  void _loginUser() async {
+    final UserModel user = UserModel(
+      email: emailController.text,
+      password: passwordController.text,
+    );
+
+    final result = await _userController.loginUser(user, prefs, context);
+    print('result: ${result}');
+
+    void _clearFields() {
+      emailController.clear();
+      passwordController.clear();
+    }
+
+    setState(() {
+      _loginStatus = result;
+    });
+
+    if (_loginStatus != 'User Login Successfull') {
+      _clearFields();
+    }
+  }
+
+  // Email and Password controllers
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,7 +65,6 @@ class LoginPage extends StatelessWidget {
       backgroundColor: Color.fromRGBO(250, 250, 252, 1),
       appBar: AppBar(
         elevation: 0,
-        // brightness: Brightness.light,
         backgroundColor: Color.fromARGB(1, 249, 249, 250),
         leading: IconButton(
           onPressed: () {
@@ -57,8 +112,11 @@ class LoginPage extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: Column(
                       children: <Widget>[
-                        inputFile(label: "Email"),
-                        inputFile(label: "Password", obscureText: true),
+                        inputFile(label: "Email", controller: emailController),
+                        inputFile(
+                            label: "Password",
+                            obscureText: true,
+                            controller: passwordController),
                       ],
                     ),
                   ),
@@ -73,7 +131,7 @@ class LoginPage extends StatelessWidget {
                       child: MaterialButton(
                         minWidth: double.infinity,
                         height: 60,
-                        onPressed: () {},
+                        onPressed: _loginUser,
                         color: kPrimaryColor,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -84,25 +142,44 @@ class LoginPage extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
                             fontSize: 18,
-                            color: white,
+                            color: Colors.white,
                           ),
                         ),
                       ),
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const <Widget>[
-                      Text("Don't have an account?"),
-                      Text(
-                        " Sign up",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 18,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => SignupPage()),
+                      );
+                    },
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: const <Widget>[
+                        Text("Don't have an account?"),
+                        Text(
+                          " Sign up",
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 18,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
+                  SizedBox(height: 20),
+                  if (_loginStatus != 'User Login Successfull')
+                    Text(
+                      _loginStatus,
+                      style: TextStyle(
+                        color: _loginStatus.startsWith('Login failed')
+                            ? Colors.red
+                            : Colors.green,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   Container(
                     padding: EdgeInsets.only(top: 100),
                     height: 200,
@@ -124,7 +201,8 @@ class LoginPage extends StatelessWidget {
 }
 
 // We will be creating a widget for a text field
-Widget inputFile({label, obscureText = false}) {
+Widget inputFile(
+    {label, obscureText = false, required TextEditingController controller}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
@@ -141,6 +219,7 @@ Widget inputFile({label, obscureText = false}) {
       ),
       TextField(
         obscureText: obscureText,
+        controller: controller,
         decoration: const InputDecoration(
           contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 10),
           enabledBorder: OutlineInputBorder(

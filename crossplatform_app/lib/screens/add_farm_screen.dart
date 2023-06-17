@@ -1,48 +1,56 @@
+import 'package:crossplatform_app/models/add_farm_model.dart';
 import 'package:flutter/material.dart';
 import 'package:crossplatform_app/constants.dart';
 import 'package:crossplatform_app/models/user_model.dart';
-import 'package:crossplatform_app/controllers/user_controller.dart';
+import 'package:crossplatform_app/controllers/add_farm_controller.dart';
 import 'package:crossplatform_app/screens/login.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
 
-class SignupPage extends StatefulWidget {
+class AddFarmPage extends StatefulWidget {
+  final String token;
+
+  const AddFarmPage({required this.token, Key? key}) : super(key: key);
+
   @override
-  _SignupPageState createState() => _SignupPageState();
+  _AddFarmPageState createState() => _AddFarmPageState();
 }
 
-class _SignupPageState extends State<SignupPage> {
-  final UserController _userController = UserController();
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
+class _AddFarmPageState extends State<AddFarmPage> {
+  late String farmerId;
+  final AddFarmController _addfarmController = AddFarmController();
+  final TextEditingController _farmnameController = TextEditingController();
+  final TextEditingController _farmsizeController = TextEditingController();
+  final TextEditingController _farmlocationController = TextEditingController();
 
-  String _registrationStatus = '';
+  @override
+  void initState() {
+    super.initState();
+    Map<String, dynamic> jwtDecodedToken = JwtDecoder.decode(widget.token);
+    farmerId = jwtDecodedToken['_id'];
+  }
 
-  void _registerUser() async {
-        final UserModel user = UserModel(
-        username: _usernameController.text,
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-      final result = await _userController.registerUser(user);
+  void _addfarm() async {
+    final AddFarmModel farm = AddFarmModel(
+      farmName: _farmnameController.text,
+      farmSize: double.parse(_farmsizeController.text),
+      farmLocation: _farmlocationController.text,
+      farmerId: farmerId,
+    );
+    final String token = widget.token;
+    final result = await _addfarmController.addfarm(farm, token);
 
-      void _clearFields() {
-        _usernameController.clear();
-        _emailController.clear();
-        _passwordController.clear();
-      }
+    void _clearFields() {
+      _farmnameController.clear();
+      _farmsizeController.clear();
+      _farmlocationController.clear();
+    }
 
-      setState(() {
-        _registrationStatus = result;
-      });
-
-      if (_registrationStatus == 'Registration successful') {
-        _clearFields();
-        //   Navigator.pushReplacement(
-        //     context,
-        //     MaterialPageRoute(builder: (context) => LoginPage()),
-        //   );
-      }
-    
+    if (result == 'Farm added Successfully') {
+      _clearFields();
+      // Success logic here
+    } else {
+      // Failure logic here
+    }
   }
 
   @override
@@ -74,31 +82,33 @@ class _SignupPageState extends State<SignupPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               Column(
-                children: <Widget>[
-                  const Text(
-                    "Sign up",
+                children: const <Widget>[
+                  Text(
+                    "Please Add your Farm",
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(
+                  SizedBox(
                     height: 20,
-                  ),
-                  Text(
-                    "Create an account",
-                    style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                   ),
                 ],
               ),
               Column(
                 children: <Widget>[
-                  inputFile(label: "Username", controller: _usernameController),
-                  inputFile(label: "Email", controller: _emailController),
                   inputFile(
-                    label: "Password",
+                    label: "Farm Name",
+                    controller: _farmnameController,
+                  ),
+                  inputFile(
+                    label: "Farm Size",
+                    controller: _farmsizeController,
+                  ),
+                  inputFile(
+                    label: "Farm Location",
                     obscureText: true,
-                    controller: _passwordController,
+                    controller: _farmlocationController,
                   ),
                 ],
               ),
@@ -116,14 +126,14 @@ class _SignupPageState extends State<SignupPage> {
                 child: MaterialButton(
                   minWidth: double.infinity,
                   height: 60,
-                  onPressed: _registerUser,
+                  onPressed: _addfarm,
                   color: kPrimaryColor,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(50),
                   ),
                   child: const Text(
-                    "Sign up",
+                    "Submit",
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 18,
@@ -132,36 +142,6 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                 ),
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const <Widget>[
-                    Text("Already have an account?"),
-                    Text(
-                      " Login",
-                      style:
-                          TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 20),
-              if (_registrationStatus.isNotEmpty)
-                Text(
-                  _registrationStatus,
-                  style: TextStyle(
-                    color: _registrationStatus.startsWith('Registration failed')
-                        ? Colors.red
-                        : Colors.green,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
             ],
           ),
         ),
@@ -170,15 +150,21 @@ class _SignupPageState extends State<SignupPage> {
   }
 }
 
-Widget inputFile(
-    {label, obscureText = false, required TextEditingController controller}) {
+Widget inputFile({
+  label,
+  obscureText = false,
+  required TextEditingController controller,
+}) {
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: <Widget>[
       Text(
         label,
         style: const TextStyle(
-            fontSize: 15, fontWeight: FontWeight.w400, color: Colors.black87),
+          fontSize: 15,
+          fontWeight: FontWeight.w400,
+          color: Colors.black87,
+        ),
       ),
       const SizedBox(
         height: 5,
@@ -192,13 +178,13 @@ Widget inputFile(
             borderSide: BorderSide(color: Color.fromARGB(255, 213, 213, 214)),
           ),
           border: OutlineInputBorder(
-              borderSide:
-                  BorderSide(color: Color.fromARGB(255, 213, 213, 214))),
+            borderSide: BorderSide(color: Color.fromARGB(255, 213, 213, 214)),
+          ),
         ),
       ),
       const SizedBox(
         height: 10,
-      )
+      ),
     ],
   );
 }

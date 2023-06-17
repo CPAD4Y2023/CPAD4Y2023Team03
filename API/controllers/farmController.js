@@ -1,4 +1,59 @@
 const Farm = require('../models/Farm');
+const User = require('../models/User');
+
+
+async function createFarm(req, res) {
+  try {
+    // Extract the farm data from the request body
+    const { farmName, farmSize, farmLocation, farmerId } = req.body;
+  
+    //Check if the farm with the same name already exists
+    const existingFarm = await Farm.findOne({ $or: [{ farmName }, {farmerId}] });
+    if(existingFarm) {
+      return res.status(400).json({ error: 'Farm already exists' });
+    }
+
+
+    // Create a new instance of the Farm model
+    const newFarm = new Farm({
+      farmName,
+      farmSize,
+      farmLocation,
+      farmerId
+    });
+  
+    // Save the new farm to the database
+    const savedFarm = await newFarm.save();
+    
+    // Return the saved farm as the response
+    res.status(201).json({ message: 'Farm Add successfully', farm: savedFarm });
+  } catch (error) {
+    // Handle any errors that occur during the process
+    res.status(500).json({ error: 'Failed to Add farm' });
+  } 
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Get all farms
 async function getAllFarms(req, res) {
@@ -25,19 +80,7 @@ async function getFarmById(req, res) {
 }
 
 // Create a new farm
-async function createFarm(req, res) {
-  try {
-    const { name, landSize, ownerId } = req.body;
 
-    // Create a new farm
-    const newFarm = new Farm({ name, landSize, owner: ownerId });
-    await newFarm.save();
-
-    res.status(201).json({ message: 'Farm created successfully', farm: newFarm });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to create farm' });
-  }
-}
 
 // Update a specific farm by ID
 async function updateFarm(req, res) {
@@ -74,4 +117,4 @@ async function deleteFarm(req, res) {
   }
 }
 
-module.exports = { getAllFarms, getFarmById, createFarm, updateFarm, deleteFarm };
+module.exports = {createFarm, getAllFarms, getFarmById, updateFarm, deleteFarm };
