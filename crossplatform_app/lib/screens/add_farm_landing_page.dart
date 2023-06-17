@@ -1,10 +1,7 @@
-// import 'dart:ui';
-
+import 'package:crossplatform_app/screens/add_farm_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:crossplatform_app/screens/add_farm_landing_page.dart';
 import 'package:crossplatform_app/constants.dart';
 import 'package:crossplatform_app/screens/signup_screen.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 
 class AddFarmLandingPage extends StatefulWidget {
   final token;
@@ -21,25 +18,15 @@ class _AddFarmLandingPageState extends State<AddFarmLandingPage> {
     return Scaffold(
       body: SafeArea(
         child: Container(
-          // we will give media query height
-          // double.infinity make it big as my parent allows
-          // while MediaQuery make it big as per the screen
-
           width: double.infinity,
           height: MediaQuery.of(context).size.height,
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 50),
           child: Column(
-            // even space distribution
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Column(
                 children: <Widget>[
-                  // const Image{
-                  //   image: AssetImage("icons/logo.png"),
-                  //   width: 100,
-                  //   height: 100,
-                  // },
                   const Text(
                     "SwasthFarms",
                     style: TextStyle(
@@ -64,26 +51,56 @@ class _AddFarmLandingPageState extends State<AddFarmLandingPage> {
               Container(
                 height: MediaQuery.of(context).size.height / 3,
                 decoration: const BoxDecoration(
-                    image:
-                        DecorationImage(image: AssetImage("icons/farmer.png"))),
+                  image: DecorationImage(
+                    image: AssetImage("icons/farmer.png"),
+                  ),
+                ),
               ),
               Column(
                 children: <Widget>[
-                  //Add Farm Button
                   MaterialButton(
                     minWidth: double.infinity,
                     height: 60,
                     color: kPrimaryColor,
                     onPressed: () {
-                      Navigator.push(
+                      if (widget.token != null) {
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => SignupPage()));
+                            builder: (context) =>
+                                AddFarmPage(token: widget.token),
+                          ),
+                        );
+                      } else {
+                        // Handle the case where the token is null
+                        // Display an error message or redirect to the login screen
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Error'),
+                            content:
+                                const Text('Token is null. Please log in.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SignupPage(),
+                                    ),
+                                  );
+                                },
+                                child: const Text('Login'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
                     },
-                    // defining the shape
                     shape: RoundedRectangleBorder(
-                        side: const BorderSide(color: Colors.black),
-                        borderRadius: BorderRadius.circular(50)),
+                      side: const BorderSide(color: Colors.black),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
                     child: const Text(
                       "Add Farm",
                       style:

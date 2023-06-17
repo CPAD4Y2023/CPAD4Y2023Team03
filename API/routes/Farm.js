@@ -4,7 +4,7 @@ const farmController = require('../controllers/farmController');
 
 router.get('/', farmController.getAllFarms);
 router.get('/:id', farmController.getFarmById);
-router.post('/', farmController.createFarm);
+router.post('/addfarm', farmController.createFarm);
 router.put('/:id', farmController.updateFarm);
 router.delete('/:id', farmController.deleteFarm);
 module.exports = router;
