@@ -8,7 +8,7 @@ promoting local food production and consumption.
 
 
 Mockup for the Application:
-https://www.figma.com/proto/g0R4m4kxdtmDw2FjVAQzau/SwasthFarms-MockUp?type=design&node-id=353-1466&scaling=scale-down&page-id=0%3A1&starting-point-node-id=353%3A2102
+https://www.figma.com/proto/g0R4m4kxdtmDw2FjVAQzau/SwasthFarms-MockUp?type=design&node-id=353-1140&scaling=scale-down&page-id=0%3A1&starting-point-node-id=353%3A2102
 
 
 **Team Members:**
